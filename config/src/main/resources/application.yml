@@ -1,0 +1,14 @@
+#
+server:
+  port: 8081
+
+
+my:
+  jdbcDriver: com.mysql.jdbc.Driver
+  jdbcUrl: jdbc:mysql://localhost:3306/test
+  jdbcUserName: root
+  jdbcPassword: 123456
+
+
+
+
