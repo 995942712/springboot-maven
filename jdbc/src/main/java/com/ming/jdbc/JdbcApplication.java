@@ -1,13 +1,13 @@
-package com.ming.jpa;
+package com.ming.jdbc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class JpaApplication {
+public class JdbcApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(JpaApplication.class, args);
+		SpringApplication.run(JdbcApplication.class, args);
 	}
 
 }

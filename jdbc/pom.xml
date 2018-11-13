@@ -6,11 +6,11 @@
         <artifactId>springboot</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>jpa</artifactId>
+    <artifactId>jdbc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>jpa</name>
-    <description>Jpa</description>
+    <name>jdbc</name>
+    <description>Jdbc</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
