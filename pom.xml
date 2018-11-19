@@ -20,6 +20,8 @@
         <module>jdbc</module>
         <module>jpa</module>
         <module>mybatis</module>
+        <module>redis</module>
+        <module>swagger2</module>
     </modules>
 
     <properties>
