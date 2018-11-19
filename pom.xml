@@ -19,6 +19,7 @@
         <module>config</module>
         <module>jdbc</module>
         <module>jpa</module>
+        <module>mybatis</module>
     </modules>
 
     <properties>
