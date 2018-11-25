@@ -1,0 +1,29 @@
+#
+server:
+  port: 8081
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: 123456
+  #禁用 thymeleaf 缓存
+  thymeleaf:
+    cache: false
+  servlet:
+    multipart:
+      #上传文件最大为10M
+      max-file-size: 10MB
+      #上传请求最大为10M
+      max-request-size: 10MB
+      #是否支持批量上传(默认值true)
+      enabled: true
+      #文件大小阈值,当大于这个阈值时将写入到磁盘,否则存在内存中
+      file-size-threshold: 0
+      #判断是否要延迟解析文件(相当于懒加载)
+      resolve-lazily: false
+
+
+
+
+

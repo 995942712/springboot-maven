@@ -22,6 +22,8 @@
         <module>mybatis</module>
         <module>redis</module>
         <module>swagger2</module>
+        <module>cache</module>
+        <module>rabbitmq</module>
     </modules>
 
     <properties>
