@@ -28,6 +28,7 @@
         <module>jms</module>
         <module>docker</module>
         <module>webservice</module>
+        <module>shiro</module>
     </modules>
 
     <properties>
