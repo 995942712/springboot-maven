@@ -4,6 +4,7 @@ import com.ming.file.domain.FileInfo;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -27,7 +28,16 @@ public interface FileService {
      * @param response
      * @return
      */
-    String download(String path, String name, String oldFileName, HttpServletResponse response);
+    String download(String path, String oldFileName, HttpServletResponse response);
+
+    /**
+     * 下载文件
+     * @param file
+     * @param response
+     * @param isDelete
+     * @return
+     */
+    void download(File file, HttpServletResponse response, boolean isDelete);
 
     /**
      * 查询全部文件

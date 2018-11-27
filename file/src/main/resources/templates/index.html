@@ -21,8 +21,7 @@
 
     <body>
         <a th:href="@{/file/fileUp}">上传文件</a>
-        <a th:href="@{/file/downloads}">多文件下载</a>
-        <a th:href="@{/file/downloadZip}">多文件打包下载</a>
+        <a href="" onclick="downloadZip()">打包下载</a>
         <table>
             <thead>
                 <tr>
@@ -36,7 +35,7 @@
             </thead>
             <tbody id="filelist">
                 <tr th:each="file : ${list}">
-                    <td><input type="checkbox" name="xx" th:value="${file.id}" /></td>
+                    <td><input type="checkbox" name="fileId" th:value="${file.id}" /></td>
                     <td th:text="${file.oldName}"></td>
                     <td th:text="${file.size}"></td>
                     <td th:text="${file.suffix}"></td>
@@ -57,5 +56,28 @@
             cb[i].checked = flag;
         }
         flag = !flag;
+    }
+    function downloadZip() {
+        var arrays = new Array();
+        var cbs = $("input[name='fileId']:checked");
+        if (cbs.length == 0) {
+            alert("請至少選擇一個");
+            return ;
+        }
+        for(var i = 0; i < cbs.length; i++) {
+            arrays.push(cbs[i].value);
+        }
+        var ids = arrays.join(',');
+        //alert(ids);
+        $.ajax({
+            type: 'POST',
+            url: '/file/downloadZip',
+            data: {ids: ids},
+            success: function (data) {
+                console.log(data);
+            }, error: function(data){
+                console.log(data);
+            }
+        });
     }
 </script>

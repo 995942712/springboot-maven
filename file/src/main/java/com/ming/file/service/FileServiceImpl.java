@@ -3,15 +3,11 @@ package com.ming.file.service;
 import com.alibaba.fastjson.JSONObject;
 import com.ming.file.dao.FileDao;
 import com.ming.file.domain.FileInfo;
-import com.ming.file.utils.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,7 +52,7 @@ public class FileServiceImpl implements FileService {
             file.transferTo(saveFile);
             String str = oldFileName + "上传成功";
             //保存数据
-            FileInfo fileInfo = new FileInfo(fileName, oldFileName, String.valueOf(file.getSize() + "k"), suffix, path, url);
+            FileInfo fileInfo = new FileInfo(fileName, oldFileName, String.valueOf(file.getSize() + "k"), suffix, path, filePath);
             if (this.save(fileInfo)) {
                 str += ",保存成功";
             } else {
@@ -75,13 +71,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public String download(String path, String name, String oldFileName, HttpServletResponse response) {
+    public String download(String path, String oldFileName, HttpServletResponse response) {
         JSONObject json = new JSONObject();
         FileInputStream fis = null;
         BufferedInputStream bis = null;
         try {
-            File file = new File(path + File.separator + name);
-            if (file.exists()) {
+            File file = new File(path);
+            if (file.exists() && file.isFile()) {
                 response.setContentType("application/force-download");
                 response.addHeader("Content-Disposition", "attachment;fileName=" + oldFileName);
                 byte[] buffer = new byte[1024];
@@ -98,7 +94,7 @@ public class FileServiceImpl implements FileService {
                 json.put("path", "");
                 json.put("code", 0);
             } else {
-                json.put("msg", oldFileName + "下载失败");
+                json.put("msg", oldFileName + "下载失败,文件不存在!");
                 json.put("path", "");
                 json.put("code", 0);
             }
@@ -125,6 +121,27 @@ public class FileServiceImpl implements FileService {
             }
         }
         return json.toJSONString();
+    }
+
+    public void download(File file, HttpServletResponse response, boolean isDelete) {
+        try {
+            BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file.getPath()));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+            response.reset();
+            OutputStream os = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment;filename=" + new String(file.getName().getBytes("UTF-8"), "ISO-8859-1"));
+            os.write(buffer);
+            os.flush();
+            os.close();
+            if (isDelete) {
+                file.delete();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
