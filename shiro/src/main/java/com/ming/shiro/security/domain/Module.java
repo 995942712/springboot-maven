@@ -5,10 +5,10 @@ import lombok.Setter;
 import java.util.Date;
 
 /**
- * 菜单模块
+ * 模块管理
  */
-@Setter
 @Getter
+@Setter
 public class Module {
 
     /**ID*/

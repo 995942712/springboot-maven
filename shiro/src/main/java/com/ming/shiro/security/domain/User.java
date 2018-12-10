@@ -3,8 +3,6 @@ package com.ming.shiro.security.domain;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 用户登录
@@ -35,7 +33,5 @@ public class User {
     private String status;
     /**备注*/
     private String remark;
-
-    private Set<Role> roles = new HashSet<>();
 
 }

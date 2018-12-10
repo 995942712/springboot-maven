@@ -3,14 +3,12 @@ package com.ming.shiro.security.domain;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * 角色
+ * 角色管理
  */
-@Setter
 @Getter
+@Setter
 public class Role {
 
     /**ID*/
@@ -35,8 +33,5 @@ public class Role {
     private String status;
     /**备注*/
     private String remark;
-
-    private Set<Module> modules = new HashSet<>();
-    private Set<User> users = new HashSet<>();
 
 }
