@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <title>Title</title>
+        <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    </head>
+
+    <body>
+        <form th:action="@{/save}" th:object="${user}" method="post">
+            <table>
+                <thead>
+                    <tr>
+                        <th th:cols="3"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>name:</td>
+                        <td>
+                            <input type="text" th:field="*{name}" />
+                        </td>
+                        <td th:if="${#fields.hasErrors('name')}" th:errors="*{name}">name error</td>
+                    </tr>
+                    <tr>
+                        <td>password:</td>
+                        <td>
+                            <input type="password" th:field="*{password}" />
+                        </td>
+                        <td th:if="${#fields.hasErrors('password')}" th:errors="*{password}">password error</td>
+                    </tr>
+                    <tr>
+                        <td th:cols="3"><input type="submit" value="提交" /></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </body>
+</html>
