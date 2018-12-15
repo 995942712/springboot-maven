@@ -6,6 +6,8 @@ import com.ming.shiro.security.domain.Module;
 import com.ming.shiro.security.domain.RoleModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,37 +23,65 @@ public class ModuleServiceImpl implements ModuleService {
 
     @Override
     public List<Module> findAll() {
-        return this.moduleDao.findAll();
+        List<Module> list = this.moduleDao.findAll();
+        if (null == list || list.size() == 0) {
+            return new ArrayList<>();
+        }
+        return list;
     }
 
     @Override
     public List<Module> findList(Module module) {
-        return this.moduleDao.findList(module);
+        List<Module> list = this.moduleDao.findList(module);
+        if (null == list || list.size() == 0) {
+            return new ArrayList<>();
+        }
+        return list;
     }
 
     @Override
     public Module findById(Integer id) {
-        return this.moduleDao.findById(id);
+        Module module = this.moduleDao.findById(id);
+        if (null == module) {
+            return new Module();
+        }
+        return module;
     }
 
     @Override
     public List<RoleModule> findRoleModule(RoleModule roleModule) {
-        return this.roleModuleDao.findList(roleModule);
+        List<RoleModule> list = this.roleModuleDao.findList(roleModule);
+        if (null == list || list.size() == 0) {
+            return new ArrayList<>();
+        }
+        return list;
     }
 
     @Override
-    public int save(Module module) {
-        return this.moduleDao.save(module);
+    public boolean save(Module module) {
+        int count = this.moduleDao.save(module);
+        if (count == 0) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public int update(Module module) {
-        return this.moduleDao.update(module);
+        int count = this.moduleDao.update(module);
+        if (count == 0) {
+            return 0;
+        }
+        return count;
     }
 
     @Override
     public int delete(Integer id) {
-        return this.moduleDao.delete(id);
+        int count = this.moduleDao.delete(id);
+        if (count == 0) {
+            return 0;
+        }
+        return count;
     }
 
 }

@@ -1,11 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <title>菜单模块表单</title>
+        <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    </head>
 
-<body>
-
-</body>
+    <body>
+        <form th:action="@{/login/save}" th:object="${user}" method="post">
+            <table>
+                <tr>
+                    <td>name:</td>
+                    <td><input type="text" th:field="*{loginName}" /></td>
+                    <td th:if="${#fields.hasErrors('loginName')}" th:errors="*{loginName}">loginName error</td>
+                </tr>
+                <tr>
+                    <td>code:</td>
+                    <td><input type="text" th:field="*{password}" /></td>
+                    <td th:if="${#fields.hasErrors('password')}" th:errors="*{password}">password error</td>
+                </tr>
+                <tr>
+                    <td>parentId:</td>
+                    <td>
+                        <input type="text" name="roleId" />
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>remark:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>createName:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>createDate:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>updateName:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>updateDate:</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="3"><input type="submit" value="保存"/></td>
+                </tr>
+            </table>
+        </form>
+    </body>
 </html>

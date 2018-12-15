@@ -6,6 +6,8 @@ import com.ming.shiro.security.dao.RoleDao;
 import com.ming.shiro.security.dao.UserRoleDao;
 import com.ming.shiro.security.domain.User;
 import com.ming.shiro.security.domain.UserRole;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -67,12 +69,25 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public int save(User user) {
-        int count = this.loginDao.save(user);
-        if (count == 0) {
-            return 0;
+    public boolean save(Integer roleId, User user) {
+        if (null == user) {
+            return false;
         }
-        return count;
+        //密码加密
+        String password = new SimpleHash("MD5", user.getPassword(), ByteSource.Util.bytes(user.getLoginName()), 1024).toString();
+        user.setPassword(password);
+        //保存登录账号
+        int count = this.loginDao.save(user);
+        if (count == 0 || null == user.getId() || null == roleId) {
+            return false;
+        }
+        //保存用户角色信息
+        UserRole userRole = new UserRole(user.getId(), roleId);
+        count = this.userRoleDao.save(userRole);
+        if (count == 0) {
+            return false;
+        }
+        return true;
     }
 
     @Override

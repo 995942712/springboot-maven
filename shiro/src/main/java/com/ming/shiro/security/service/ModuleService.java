@@ -41,7 +41,7 @@ public interface ModuleService {
      * @param module
      * @return
      */
-    int save(Module module);
+    boolean save(Module module);
 
     /**
      * 更新模块信息

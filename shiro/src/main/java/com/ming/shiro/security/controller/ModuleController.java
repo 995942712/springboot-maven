@@ -42,8 +42,8 @@ public class ModuleController {
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public String save(@Valid Module module, BindingResult bindingResult){
-        int i = this.moduleService.save(module);
-        System.out.println(i);
+        boolean b = this.moduleService.save(module);
+        System.out.println(module.getId());
         if (bindingResult.hasErrors()) {
             return "security/moduleForm";
         }

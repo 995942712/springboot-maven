@@ -19,26 +19,26 @@
     <body>
         <table>
             <thead>
-            <tr>
-                <th><input type="checkbox" id="qx" onclick="qxan(this)" /></th>
-                <th>模块名称</th>
-                <th>模块编码</th>
-                <th>父级模块</th>
-                <th>模块全称</th>
-                <th>模块URL</th>
-                <th>操作</th>
-            </tr>
+                <tr>
+                    <th><input type="checkbox" id="qx" onclick="qxan(this)" /></th>
+                    <th>模块名称</th>
+                    <th>模块编码</th>
+                    <th>父级模块</th>
+                    <th>模块全称</th>
+                    <th>模块URL</th>
+                    <th>操作</th>
+                </tr>
             </thead>
             <tbody id="filelist">
-            <tr th:each="module : ${list}">
-                <td><input type="checkbox" name="moduleId" th:value="${module.id}" /></td>
-                <td th:text="${module.name}"></td>
-                <td th:text="${module.code}"></td>
-                <td th:text="${module.parentId}"></td>
-                <td th:text="${module.path}"></td>
-                <td th:text="${module.url}"></td>
-                <td></td>
-            </tr>
+                <tr th:each="module : ${list}">
+                    <td><input type="checkbox" name="moduleId" th:value="${module.id}" /></td>
+                    <td th:text="${module.name}"></td>
+                    <td th:text="${module.code}"></td>
+                    <td th:text="${module.parentId}"></td>
+                    <td th:text="${module.path}"></td>
+                    <td th:text="${module.url}"></td>
+                    <td></td>
+                </tr>
             </tbody>
         </table>
     </body>

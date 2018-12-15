@@ -8,8 +8,8 @@
     </resultMap>
 
     <sql id="userRoleColumn">
-        user_id userId,
-        role_id roleId
+        user_id,
+        role_id
     </sql>
 
     <select id="findAll" resultMap="UserRoles">

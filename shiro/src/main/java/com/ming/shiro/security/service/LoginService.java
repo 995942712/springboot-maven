@@ -48,7 +48,7 @@ public interface LoginService {
      * @param user
      * @return
      */
-    int save(User user);
+    boolean save(Integer roleId, User user);
 
     /**
      * 更新登录账号信息

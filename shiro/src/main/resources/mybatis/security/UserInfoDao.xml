@@ -19,13 +19,13 @@
     <sql id="userInfosColumn">
         id,
         name,
-        user_id userId,
-        create_id createId,
-        create_name createName,
-        create_date createDate,
-        update_id updateId,
-        update_name updateName,
-        update_date updateDate,
+        user_id,
+        create_id,
+        create_name,
+        create_date,
+        update_id,
+        update_name,
+        update_date,
         status,
         remark
     </sql>

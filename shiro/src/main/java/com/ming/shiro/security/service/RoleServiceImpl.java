@@ -9,6 +9,8 @@ import com.ming.shiro.security.domain.RoleModule;
 import com.ming.shiro.security.domain.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,41 +30,82 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> findAll() {
-        return null;
+        List<Role> list = this.roleDao.findAll();
+        if (null == list || list.size() == 0) {
+            return new ArrayList<>();
+        }
+        return list;
     }
 
     @Override
     public List<Role> findList(Role role) {
-        return null;
+        List<Role> list = this.roleDao.findList(role);
+        if (null == list || list.size() == 0) {
+            return new ArrayList<>();
+        }
+        return list;
     }
 
     @Override
     public List<RoleModule> findRoleModule(RoleModule roleModule) {
-        return this.roleModuleDao.findList(roleModule);
+        List<RoleModule> list = this.roleModuleDao.findList(roleModule);
+        if (null == list || list.size() == 0) {
+            return new ArrayList<>();
+        }
+        return list;
     }
 
     @Override
     public List<UserRole> findUserRole(UserRole userRole) {
-        return this.userRoleDao.findList(userRole);
+        List<UserRole> list = this.userRoleDao.findList(userRole);
+        if (null == list || list.size() == 0) {
+            return new ArrayList<>();
+        }
+        return list;
     }
 
     @Override
     public Role findById(Integer id) {
-        return null;
+        Role role = this.roleDao.findById(id);
+        if (null == role) {
+            return new Role();
+        }
+        return role;
     }
 
     @Override
-    public int save(Role role) {
-        return 0;
+    public boolean save(Integer moduleId, Role role) {
+        if (null == role) {
+            return false;
+        }
+        int count = this.roleDao.save(role);
+        if (count == 0 || null == role.getId() || null == moduleId) {
+            return false;
+        }
+        RoleModule roleModule = new RoleModule(role.getId(), moduleId);
+        count = this.roleModuleDao.save(roleModule);
+        if (count == 0) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public int update(Role role) {
-        return 0;
+        int count = this.roleDao.update(role);
+        if (count == 0) {
+            return 0;
+        }
+        return count;
     }
 
     @Override
     public int delete(Integer id) {
-        return 0;
+        int count = this.roleDao.delete(id);
+        if (count == 0) {
+            return 0;
+        }
+        return count;
     }
+
 }

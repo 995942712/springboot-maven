@@ -15,7 +15,9 @@ spring:
 mybatis:
   type-aliases-package: com.ming.shiro.security.domain
   mapper-locations: classpath*:mybatis/**/*Dao.xml
-
+logging:
+  level:
+    com.ming.shiro.security.dao: debug
 
 
 

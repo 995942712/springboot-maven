@@ -1,11 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <title>菜单模块列表</title>
+        <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+        <style>
+            table {
+                border: 1px solid red;
+                width: 100%;
+                height: 100%;
+            }
+            td,th {
+                border: 1px solid red;
+            }
+        </style>
+    </head>
 
-<body>
-
-</body>
+    <body>
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="qx" onclick="qxan(this)" /></th>
+                    <th>模块名称</th>
+                    <th>模块编码</th>
+                    <th>父级模块</th>
+                    <th>模块全称</th>
+                    <th>模块URL</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="filelist">
+                <tr th:each="role : ${list}">
+                    <td><input type="checkbox" name="roleId" th:value="${role.id}" /></td>
+                    <td th:text="${role.name}"></td>
+                    <td th:text="${role.code}"></td>
+                    <!--<td th:text="${role.moduleId}"></td>-->
+                    <td th:text="${role.status}"></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
 </html>
+<script type="text/javascript">
+    //
+    //alert(window.location.protocol + '//' + window.location.host)
+    var flag = true;
+    function qxan(a){
+        var cb = $("input:checkbox");
+        for(var i = 0; i < cb.length; i++) {
+            cb[i].checked = flag;
+        }
+        flag = !flag;
+    }
+</script>

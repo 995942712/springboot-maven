@@ -49,7 +49,7 @@ public interface RoleService {
      * @param role
      * @return
      */
-    int save(Role role);
+    boolean save(Integer moduleId, Role role);
 
     /**
      * 更新角色信息

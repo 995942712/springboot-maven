@@ -23,15 +23,15 @@
         id,
         name,
         code,
-        parent_id parentId,
+        parent_id,
         path,
         url,
-        create_id createId,
-        create_name createName,
-        create_date createDate,
-        update_id updateId,
-        update_name updateName,
-        update_date updateDate,
+        create_id,
+        create_name,
+        create_date,
+        update_id,
+        update_name,
+        update_date,
         status,
         remark
     </sql>
@@ -90,7 +90,7 @@
       from sys_module where id = #{id, jdbcType=INTEGER}
     </select>
 
-    <insert id="save" parameterType="com.ming.shiro.security.domain.Module">
+    <insert id="save" parameterType="com.ming.shiro.security.domain.Module" useGeneratedKeys="true" keyProperty="id">
       insert into sys_module(
         id,
         name,

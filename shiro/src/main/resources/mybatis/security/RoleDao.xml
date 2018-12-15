@@ -20,12 +20,12 @@
         id,
         name,
         code,
-        create_id createId,
-        create_name createName,
-        create_date createDate,
-        update_id updateId,
-        update_name updateName,
-        update_date updateDate,
+        create_id,
+        create_name,
+        create_date,
+        update_id,
+        update_name,
+        update_date,
         status,
         remark
     </sql>
@@ -78,7 +78,7 @@
         from sys_role where id = #{id, jdbcType=INTEGER}
     </select>
 
-    <insert id="save" parameterType="com.ming.shiro.security.domain.Role">
+    <insert id="save" parameterType="com.ming.shiro.security.domain.Role" useGeneratedKeys="true" keyProperty="id">
         insert into sys_role(
         id,
         name,

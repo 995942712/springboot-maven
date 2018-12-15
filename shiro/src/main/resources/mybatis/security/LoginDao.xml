@@ -31,15 +31,11 @@
     </sql>
 
     <select id="findAll" resultMap="Users">
-        select
-        <include refid="userColumn" />
-        from sys_user
+        select * from sys_user
     </select>
 
     <select id="findList" parameterType="com.ming.shiro.security.domain.User" resultMap="Users">
-        select
-        <include refid="userColumn" />
-        from sys_user
+        select * from sys_user
         <where>
             1 = 1
             <if test="loginName != null and loginName != ''">
@@ -72,43 +68,43 @@
         </where>
     </select>
 
-    <select id="findById" parameterType="integer">
+    <select id="findById" parameterType="integer" resultType="com.ming.shiro.security.domain.User">
         select
-        <include refid="userColumn" />
+          <include refid="userColumn" />
         from sys_user where id = #{id, jdbcType=INTEGER}
     </select>
 
-    <select id="findByLoginName" parameterType="string">
+    <select id="findByLoginName" parameterType="string" resultType="com.ming.shiro.security.domain.User">
         select
-        <include refid="userColumn" />
-        from sys_user where #{loginName, jdbcType=VARCHAR}
+          <include refid="userColumn" />
+        from sys_user where login_name = #{loginName, jdbcType=VARCHAR}
     </select>
 
-    <insert id="save" parameterType="com.ming.shiro.security.domain.User">
+    <insert id="save" parameterType="com.ming.shiro.security.domain.User" useGeneratedKeys="true" keyProperty="id">
         insert into sys_user(
-        id,
-        login_name,
-        password,
-        create_id,
-        create_name,
-        create_date,
-        update_id,
-        update_name,
-        update_date,
-        status,
-        remark
+            id,
+            login_name,
+            password,
+            create_id,
+            create_name,
+            create_date,
+            update_id,
+            update_name,
+            update_date,
+            status,
+            remark
         ) values (
-        #{id, jdbcType=INTEGER},
-        #{loginName, jdbcType=VARCHAR},
-        #{password, jdbcType=VARCHAR},
-        #{createId, jdbcType=INTEGER},
-        #{createName, jdbcType=VARCHAR},
-        #{createDate, jdbcType=TIMESTAMP},
-        #{updateId, jdbcType=INTEGER},
-        #{updateName, jdbcType=VARCHAR},
-        #{createDate, jdbcType=TIMESTAMP},
-        #{status, jdbcType=VARCHAR},
-        #{remark, jdbcType=VARCHAR}
+            #{id, jdbcType=INTEGER},
+            #{loginName, jdbcType=VARCHAR},
+            #{password, jdbcType=VARCHAR},
+            #{createId, jdbcType=INTEGER},
+            #{createName, jdbcType=VARCHAR},
+            #{createDate, jdbcType=TIMESTAMP},
+            #{updateId, jdbcType=INTEGER},
+            #{updateName, jdbcType=VARCHAR},
+            #{createDate, jdbcType=TIMESTAMP},
+            #{status, jdbcType=VARCHAR},
+            #{remark, jdbcType=VARCHAR}
         )
     </insert>
 
