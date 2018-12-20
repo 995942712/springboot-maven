@@ -1,14 +1,24 @@
 package com.ming.shiro.filter;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ming.shiro.security.domain.User;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
+import org.apache.shiro.web.util.WebUtils;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
@@ -39,7 +49,7 @@ public class KickoutSessionFilter extends AccessControlFilter {
         this.sessionManager = sessionManager;
     }
 
-    // 设置Cache的key的前缀
+    //设置Cache的key的前缀
     public void setCacheManager(CacheManager cacheManager) {
         //必须和ehcache缓存配置中的缓存name一致
         this.cache = cacheManager.getCache("shiro-activeSessionCache");
@@ -53,127 +63,111 @@ public class KickoutSessionFilter extends AccessControlFilter {
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         Subject subject = getSubject(request, response);
-        // 没有登录授权 且没有记住我
+        //没有登录授权 且没有记住我
         if (!subject.isAuthenticated() && !subject.isRemembered()) {
-            // 如果没有登录，直接进行之后的流程
-            //判断是不是Ajax请求，异步请求，直接响应返回未登录
-            ResponseResult responseResult = new ResponseResult();
-            if (ShiroFilterUtils.isAjax(request) ) {
-                logger.debug(getClass().getName()+ "当前用户已经在其他地方登录，并且是Ajax请求！");
-                responseResult.setCode(IStatusMessage.SystemStatus.MANY_LOGINS.getCode());
-                responseResult.setMessage("您已在别处登录，请您修改密码或重新登录");
-                out(response, responseResult);
+            //如果没有登录,直接进行之后的流程,判断是不是Ajax请求,异步请求,直接响应返回未登录
+            JSONObject json = new JSONObject();
+            if (this.isAjax(request)) {
+                System.out.println(getClass().getName() + "当前用户已经在其他地方登录，并且是Ajax请求！");
+                json.put("status", "1101");
+                json.put("message", "您已在别处登录，请您修改密码或重新登录");
+                out(response, json);
                 return false;
-            }else{
+            } else {
                 return true;
             }
         }
-        // 获得用户请求的URI
-        HttpServletRequest req=(HttpServletRequest) request;
+        //获得用户请求的URI
+        HttpServletRequest req = (HttpServletRequest) request;
         String path = req.getRequestURI();
-        logger.debug("===当前请求的uri：==" + path);
-        //String contextPath = req.getContextPath();
-        //logger.debug("===当前请求的域名或ip+端口：==" + contextPath);
+        System.out.println("===当前请求的uri：==" + path);
         //放行登录
-        if(path.equals("/toLogin")){
+        if (path.equals("/toLogin")) {
             return true;
         }
         Session session = subject.getSession();
-        logger.debug("==session时间设置：" + String.valueOf(session.getTimeout())
-                + "===========");
+        System.out.println("==session时间设置：" + String.valueOf(session.getTimeout()) + "===========");
         try {
-            // 当前用户
+            //当前用户
             User user = (User) subject.getPrincipal();
-            String username = user.getUsername();
-            logger.debug("===当前用户username：==" + username);
+            String username = user.getLoginName();
+            System.out.println("===当前用户username：==" + username);
             Serializable sessionId = session.getId();
-            logger.debug("===当前用户sessionId：==" + sessionId);
-            // 读取缓存用户 没有就存入
+            System.out.println("===当前用户sessionId：==" + sessionId);
+            //读取缓存用户,没有就存入
             Deque<Serializable> deque = cache.get(username);
-            logger.debug("===当前deque：==" + deque);
+            System.out.println("===当前deque：==" + deque);
             if (deque == null) {
-                // 初始化队列
+                //初始化队列
                 deque = new ArrayDeque<Serializable>();
             }
-            // 如果队列里没有此sessionId，且用户没有被踢出；放入队列
-            if (!deque.contains(sessionId)
-                    && session.getAttribute("kickout") == null) {
-                // 将sessionId存入队列
+            //如果队列里没有此sessionId,且用户没有被踢出,放入队列
+            if (!deque.contains(sessionId) && session.getAttribute("kickout") == null) {
+                //将sessionId存入队列
                 deque.push(sessionId);
-                // 将用户的sessionId队列缓存
+                //将用户的sessionId队列缓存
                 cache.put(username, deque);
             }
-            // 如果队列里的sessionId数超出最大会话数，开始踢人
+            //如果队列里的sessionId数超出最大会话数,开始踢人
             while (deque.size() > maxSession) {
-                logger.debug("===deque队列长度：==" + deque.size());
+                System.out.println("===deque队列长度：==" + deque.size());
                 Serializable kickoutSessionId = null;
-                // 是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户；
-                if (kickoutAfter) { // 如果踢出后者
+                //是否踢出后来登录的,默认是false,即后者登录的用户踢出前者登录的用户
+                if (kickoutAfter) {
                     kickoutSessionId = deque.removeFirst();
-                } else { // 否则踢出前者
+                } else {
                     kickoutSessionId = deque.removeLast();
                 }
-                // 踢出后再更新下缓存队列
+                //踢出后再更新下缓存队列
                 cache.put(username, deque);
                 try {
-                    // 获取被踢出的sessionId的session对象
-                    Session kickoutSession = sessionManager
-                            .getSession(new DefaultSessionKey(kickoutSessionId));
+                    //获取被踢出的sessionId的session对象
+                    Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
                     if (kickoutSession != null) {
-                        // 设置会话的kickout属性表示踢出了
+                        //设置会话的kickout属性表示踢出了
                         kickoutSession.setAttribute("kickout", true);
                     }
-                } catch (Exception e) {// ignore exception
+                } catch (Exception e) {
+
                 }
             }
-
-            // 如果被踢出了，(前者或后者)直接退出，重定向到踢出后的地址
-            if ((Boolean) session.getAttribute("kickout") != null
-                    && (Boolean) session.getAttribute("kickout") == true) {
-                // 会话被踢出了
+            //如果被踢出了(前者或后者)直接退出,重定向到踢出后的地址
+            if ((Boolean) session.getAttribute("kickout") != null && (Boolean) session.getAttribute("kickout") == true) {
+                //会话被踢出了
                 try {
-                    // 退出登录
+                    //退出登录
                     subject.logout();
-                } catch (Exception e) { // ignore
+                } catch (Exception e) {
+
                 }
                 saveRequest(request);
-                logger.debug("==踢出后用户重定向的路径kickoutUrl:" + kickoutUrl);
-                // ajax请求
-                // 重定向
-                //WebUtils.issueRedirect(request, response, kickoutUrl);
-                return isAjaxResponse(request,response);
+                System.out.println("==踢出后用户重定向的路径kickoutUrl:" + kickoutUrl);
+                return isAjaxResponse(request, response);
             }
             return true;
-        } catch (Exception e) { // ignore
-            logger.error(
-                    "控制用户在线数量【lyd-admin-->KickoutSessionFilter.onAccessDenied】异常！",
-                    e);
-            // 重启后，ajax请求，报错：java.lang.ClassCastException:
-            // com.lyd.admin.pojo.AdminUser cannot be cast to
-            // com.lyd.admin.pojo.AdminUser
-            // 处理 ajax请求
-            return isAjaxResponse(request,response);
+        } catch (Exception e) {
+            System.out.println("控制用户在线数量【lyd-admin-->KickoutSessionFilter.onAccessDenied】异常！" + e);
+            return isAjaxResponse(request, response);
         }
-        return false;
     }
 
     /**
-     * @描述：response输出json
      * @param response
-     * @param result
+     * @param json
+     * @描述：response输出json
      */
-    public static void out(ServletResponse response, ResponseResult result){
+    public static void out(ServletResponse response, JSONObject json) {
         PrintWriter out = null;
         try {
             response.setCharacterEncoding("UTF-8");//设置编码
             response.setContentType("application/json");//设置返回类型
             out = response.getWriter();
-            out.println(objectMapper.writeValueAsString(result));//输出
-            logger.error("用户在线数量限制【wyait-manager-->KickoutSessionFilter.out】响应json信息成功");
+            out.println(objectMapper.writeValueAsString(json));//输出
+            System.out.println("用户在线数量限制【wyait-manager-->KickoutSessionFilter.out】响应json信息成功");
         } catch (Exception e) {
-            logger.error("用户在线数量限制【wyait-manager-->KickoutSessionFilter.out】响应json信息出错", e);
-        }finally{
-            if(null != out){
+            System.out.println("用户在线数量限制【wyait-manager-->KickoutSessionFilter.out】响应json信息出错" + e);
+        } finally {
+            if (null != out) {
                 out.flush();
                 out.close();
             }
@@ -182,17 +176,27 @@ public class KickoutSessionFilter extends AccessControlFilter {
 
     private boolean isAjaxResponse(ServletRequest request, ServletResponse response) throws IOException {
         //判断是不是Ajax请求
-        ResponseResult responseResult = new ResponseResult();
-        if (ShiroFilterUtils.isAjax(request) ) {
-            logger.debug(getClass().getName()+ "当前用户已经在其他地方登录，并且是Ajax请求！");
-            responseResult.setCode(IStatusMessage.SystemStatus.MANY_LOGINS.getCode());
-            responseResult.setMessage("您已在别处登录，请您修改密码或重新登录");
-            out(response, responseResult);
-        }else{
+        JSONObject json = new JSONObject();
+        if (this.isAjax(request)) {
+            System.out.println(getClass().getName() + "当前用户已经在其他地方登录，并且是Ajax请求！");
+            json.put("status", "1101");
+            json.put("message", "您已在别处登录，请您修改密码或重新登录");
+            out(response, json);
+        } else {
             // 重定向
             WebUtils.issueRedirect(request, response, kickoutUrl);
         }
         return false;
+    }
+
+    public static boolean isAjax(ServletRequest request) {
+        String header = ((HttpServletRequest) request).getHeader("X-Requested-With");
+        if ("XMLHttpRequest".equalsIgnoreCase(header)) {
+            System.out.println("shiro工具类【wyait-manager-->ShiroFilterUtils.isAjax】当前请求,为Ajax请求");
+            return Boolean.TRUE;
+        }
+        System.out.println("shiro工具类【wyait-manager-->ShiroFilterUtils.isAjax】当前请求,非Ajax请求");
+        return Boolean.FALSE;
     }
 
 }

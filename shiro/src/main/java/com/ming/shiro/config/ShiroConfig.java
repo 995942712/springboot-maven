@@ -1,12 +1,11 @@
 package com.ming.shiro.config;
 
+import com.ming.shiro.filter.KickoutSessionFilter;
 import com.ming.shiro.utils.RetryLimitHashedCredentialsMatcher;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
-import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.codec.Base64;
 import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -18,6 +17,7 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import javax.servlet.Filter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -49,9 +49,9 @@ public class ShiroConfig {
         map.put("/login/login", "anon");
         //map.put("/index", "anon");
         map.put("/login/validateCode", "anon");
-        map.put("/**", "authc");
+        map.put("/**", "kickout,authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(map);
-        Map<String, String> filters = new LinkedHashMap<String, String>();
+        Map<String, Filter> filters = new LinkedHashMap<String, Filter>();
         filters.put("kickout", kickoutSessionFilter());
         shiroFilterFactoryBean.setFilters(filters);
         //指定要求登录时的链接
@@ -191,7 +191,7 @@ public class ShiroConfig {
         //同一个用户最大的会话数,默认1,比如2的意思是同一个用户允许最多同时两个人登录
         kickoutSessionFilter.setMaxSession(1);
         //被踢出后重定向到的地址
-        kickoutSessionFilter.setKickoutUrl("/toLogin?kickout=1");
+        kickoutSessionFilter.setKickoutUrl("/");
         return kickoutSessionFilter;
     }
 
