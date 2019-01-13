@@ -1,7 +1,10 @@
-#
+# file配置
 server:
   port: 8081
+
 spring:
+  application:
+    name: file
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
@@ -22,8 +25,5 @@ spring:
       file-size-threshold: 0
       #判断是否要延迟解析文件(相当于懒加载)
       resolve-lazily: false
-
-
-
 
 

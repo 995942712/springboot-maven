@@ -1,12 +1,7 @@
 package com.ming.jms.utils;
 
 import com.sun.mail.util.MailSSLSocketFactory;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -15,8 +10,6 @@ import javax.mail.internet.MimeMessage;
 import java.util.Date;
 import java.util.Properties;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class EmailUtil {
 
     @Value("spring.mail.protocol")
@@ -31,7 +24,6 @@ public class EmailUtil {
     private String password;
     private String sendUrl = "2416289468@qq.com";
 
-    @Test
     public void send() {
         Properties prop = new Properties();
         //协议

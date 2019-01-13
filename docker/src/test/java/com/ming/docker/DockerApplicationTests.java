@@ -11,6 +11,7 @@ public class DockerApplicationTests {
 
 	@Test
 	public void contextLoads() {
+
 	}
 
 }

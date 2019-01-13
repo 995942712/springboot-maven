@@ -24,7 +24,6 @@ public class StudentEndpoint {
     public StudentDetailsResponse getStudent(@RequestPayload StudentDetailsRequest request) {
         StudentDetailsResponse response = new StudentDetailsResponse();
         response.setStudent(StudentRepository.findStudent(request.getName()));
-
         return response;
     }
 

@@ -1,0 +1,19 @@
+# solr配置
+server:
+  port: 8081
+
+spring:
+  application:
+    name: solr
+  data:
+    solr:
+      host: http://192.168.136.129:8080/solr
+
+
+
+
+
+
+
+
+

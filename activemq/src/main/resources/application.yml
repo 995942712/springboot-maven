@@ -1,0 +1,29 @@
+# activemq配置
+server:
+  port: 8081
+
+spring:
+  application:
+    name: activemq
+  # 单个activemq
+  activemq:
+    broker-url: tcp://192.168.136.128:61616
+    in-memory: true
+    pool:
+      enabled: false
+    user: admin
+    password: admin
+  # 多个activemq
+#  activemq:
+#    broker-url: tcp://192.168.136.128:61616,tcp://192.168.136.129:61616
+#    in-memory: true
+#    pool:
+#      enabled: true
+#    user: admin
+#    password: admin
+
+
+
+
+
+

@@ -11,6 +11,7 @@ public class Swagger2ApplicationTests {
 
 	@Test
 	public void contextLoads() {
+
 	}
 
 }

@@ -8,28 +8,34 @@
     </parent>
     <groupId>com.ming</groupId>
     <artifactId>springboot</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
-    <name>springboot</name>
-    <description>springboot</description>
+    <name>${project.artifactId}</name>
+    <description>SpringBoot</description>
 
     <modules>
-        <module>demo</module>
-        <module>thymeleaf</module>
+        <module>activemq</module>
+        <module>cache</module>
         <module>config</module>
+        <module>demo</module>
+        <module>docker</module>
+        <module>elasticsearch</module>
+        <module>file</module>
         <module>jdbc</module>
+        <module>jms</module>
         <module>jpa</module>
+        <module>kafka</module>
         <module>mybatis</module>
         <module>mybatisplus</module>
-        <module>redis</module>
-        <module>swagger2</module>
-        <module>cache</module>
         <module>rabbitmq</module>
-        <module>tasks</module>
-        <module>jms</module>
-        <module>docker</module>
-        <module>webservice</module>
+        <module>redis</module>
         <module>shiro</module>
+        <module>solr</module>
+        <module>swagger2</module>
+        <module>tasks</module>
+        <module>thymeleaf</module>
+        <module>webservice</module>
+        <module>websocket</module>
     </modules>
 
     <properties>
@@ -39,6 +45,7 @@
     </properties>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -46,6 +53,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>

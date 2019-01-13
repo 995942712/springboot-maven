@@ -21,14 +21,14 @@ public class Config extends WsConfigurerAdapter {
         MessageDispatcherServlet servlet = new MessageDispatcherServlet();
         servlet.setApplicationContext(applicationContext);
         servlet.setTransformWsdlLocations(true);
-        return new ServletRegistrationBean(servlet, "/service/*");
+        return new ServletRegistrationBean(servlet, "/server/*");
     }
 
     @Bean(name = "test")
     public DefaultWsdl11Definition defaultWsdl11Definition(XsdSchema schema) {
         DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
         wsdl11Definition.setPortTypeName("StudentDetailsPort");
-        wsdl11Definition.setLocationUri("/service/test");
+        wsdl11Definition.setLocationUri("/server/test");
         wsdl11Definition.setTargetNamespace("http://127.0.0.1:8080/test");
         wsdl11Definition.setSchema(schema);
         return wsdl11Definition;

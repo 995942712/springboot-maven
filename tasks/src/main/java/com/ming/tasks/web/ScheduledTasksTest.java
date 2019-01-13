@@ -16,8 +16,6 @@ public class ScheduledTasksTest {
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasksTest.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-
-
     /**
      * @Scheduled(fixedRate = 5000)//上一次开始执行时间点之后5秒再执行
      * @Scheduled(fixedDelay = 5000)//上一次执行完毕时间点之后5秒再执行

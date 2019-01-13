@@ -1,7 +1,10 @@
-#
+# redis配置
 server:
   port: 8081
+
 spring:
+  application:
+    name: redis
   redis:
     host: 192.168.136.129
     port: 6379
@@ -13,7 +16,4 @@ spring:
         max-wait: -1
         max-idle: 8
         min-idle: 0
-
-
-
 

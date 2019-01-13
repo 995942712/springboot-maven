@@ -1,7 +1,10 @@
-#
+# mybatis配置
 server:
   port: 8081
+
 spring:
+  application:
+    name: mybatis
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
@@ -11,7 +14,6 @@ spring:
 mybatis:
   type-aliases-package: com.ming.mybatis.user.domain
   mapper-locations: classpath*:mybatis/*Dao.xml
-
 
 
 

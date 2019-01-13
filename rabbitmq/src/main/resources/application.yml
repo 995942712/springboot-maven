@@ -1,9 +1,14 @@
-#
+# rabbitmq配置
+server:
+  port: 8081
+
 spring:
+  application:
+    name: rabbitmq
   rabbitmq:
     host: 192.168.136.129
     port: 5672
     username: guest
     password: guest
-
+    publisher-confirms: true
 

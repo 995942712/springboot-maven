@@ -1,0 +1,19 @@
+# websocket配置
+server:
+  port: 8081
+
+spring:
+  application:
+    name: websocket
+  #禁用 thymeleaf 缓存
+  thymeleaf:
+    cache: false
+
+
+
+
+
+
+
+
+

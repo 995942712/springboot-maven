@@ -1,7 +1,10 @@
-#
+# jps配置
 server:
   port: 8081
+
 spring:
+  application:
+    name: jps
   mail:
     protocol: stmp
     default-encoding: utf-8
@@ -9,6 +12,7 @@ spring:
     port: 465
     username:
     password:
+
 
 
 
