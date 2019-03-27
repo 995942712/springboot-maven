@@ -1,141 +1,80 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ming.shiro.security.dao.RoleDao">
+<mapper namespace="com.ming.shiro.dao.security.RoleDao">
 
-    <resultMap id="Roles" type="com.ming.shiro.security.domain.Role">
-        <id column="id" property="id" jdbcType="INTEGER" />
-        <result column="name" property="name" jdbcType="VARCHAR" />
-        <result column="code" property="code" jdbcType="VARCHAR" />
-        <result column="create_id" property="createId" jdbcType="INTEGER" />
-        <result column="create_name" property="createName" jdbcType="VARCHAR" />
-        <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
-        <result column="update_id" property="updateId" jdbcType="INTEGER" />
-        <result column="update_name" property="updateName" jdbcType="VARCHAR" />
-        <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
-        <result column="status" property="status" jdbcType="VARCHAR" />
-        <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <resultMap id="Roles" type="com.ming.shiro.domain.security.Role">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="create_id" property="createId" jdbcType="BIGINT"/>
+        <result column="create_name" property="createName" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="update_id" property="updateId" jdbcType="BIGINT"/>
+        <result column="update_name" property="updateName" jdbcType="VARCHAR"/>
+        <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <collection property="moduleSet" ofType="com.ming.shiro.domain.security.Module">
+            <result column="moduleSet.id" property="id"/>
+            <result column="moduleSet.name" property="name"/>
+            <result column="moduleSet.code" property="code"/>
+            <result column="moduleSet.icon" property="icon"/>
+            <result column="module.url" property="url"/>
+            <result column="module.bgColor" property="bgColor"/>
+        </collection>
     </resultMap>
 
     <sql id="roleColumn">
         id,
         name,
         code,
-        create_id,
-        create_name,
-        create_date,
-        update_id,
-        update_name,
-        update_date,
+        create_id createId,
+        create_name createName,
+        create_date createDate,
+        update_id updateId,
+        update_name updateName,
+        update_date updateDate,
         status,
         remark
     </sql>
 
-    <select id="findAll" resultMap="Roles">
-        select
-          <include refid="roleColumn" />
-        from sys_role
+    <select id="selectRoleById" resultMap="Roles" parameterType="java.lang.Long">
+        SELECT
+            r.id,
+            r.name,
+            r.status,
+            r.remark,
+            m.id moduleSet.id,
+            m.name moduleSet.name,
+            m.code moduleSet.code,
+            m.icon moduleSet.icon,
+            m.url AS "module.url",
+            m.bg_color AS "module.bgColor"
+        FROM sys_role r
+        LEFT JOIN sys_role_module srm ON srm.role_id = r.id
+        LEFT JOIN sys_module m ON m.id = srm.module_id
+        WHERE r.status = 0
+        <if test="id != 0 or id != null">
+            AND r.id = #{id}
+        </if>
     </select>
 
-    <select id="findList" parameterType="com.ming.shiro.security.domain.Role" resultMap="Roles">
-        select
-          <include refid="roleColumn" />
-        from sys_role
-        <where>
-            1 = 1
-            <if test="name != null and name != ''">
-                and name = #{name, jdbcType=VARCHAR},
-            </if>
-            <if test="code != null and code != ''">
-                and code = #{code, jdbcType=VARCHAR},
-            </if>
-            <if test="status != null and status != ''">
-                and status = #{status, jdbcType=VARCHAR},
-            </if>
-            <if test="createId != null">
-                and create_id = #{createId, jdbcType=INTEGER},
-            </if>
-            <if test="createName != null and createName != ''">
-                and create_name = #{createName, jdbcType=VARCHAR},
-            </if>
-            <if test="createDate != null">
-                and create_date = #{createDate, jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateId != null">
-                and update_id = #{updateId, jdbcType=INTEGER},
-            </if>
-            <if test="updateName != null and updateName != ''">
-                and update_name = #{updateName, jdbcType=VARCHAR},
-            </if>
-            <if test="updateDate != null">
-                and update_date = #{updateDate, jdbcType=TIMESTAMP},
-            </if>
-        </where>
-    </select>
-
-    <select id="findById" parameterType="integer">
-        select
-        <include refid="roleColumn" />
-        from sys_role where id = #{id, jdbcType=INTEGER}
-    </select>
-
-    <insert id="save" parameterType="com.ming.shiro.security.domain.Role" useGeneratedKeys="true" keyProperty="id">
-        insert into sys_role(
-        id,
-        name,
-        code,
-        create_id,
-        create_name,
-        create_date,
-        update_id,
-        update_name,
-        update_date,
-        status,
-        remark
-        ) values (
-        #{id, jdbcType=INTEGER},
-        #{name, jdbcType=VARCHAR},
-        #{code, jdbcType=VARCHAR},
-        #{createId, jdbcType=INTEGER},
-        #{createName, jdbcType=VARCHAR},
-        #{createDate, jdbcType=TIMESTAMP},
-        #{updateId, jdbcType=INTEGER},
-        #{updateName, jdbcType=VARCHAR},
-        #{createDate, jdbcType=TIMESTAMP},
-        #{status, jdbcType=VARCHAR},
-        #{remark, jdbcType=VARCHAR}
-        )
+    <insert id="saveRoleModules">
+        INSERT INTO sys_role_module(
+            role_id,
+            module_id
+        ) VALUES
+        <foreach collection="modules" item="m" index="index" separator=",">
+            (#{roleId}, #{m.id})
+        </foreach>
     </insert>
 
-    <update id="update" parameterType="com.ming.shiro.security.domain.Role">
-        update sys_role
-        <set>
-            <if test="name != null and name != ''">
-                name = #{name, jdbcType=VARCHAR},
-            </if>
-            <if test="code != null and code != ''">
-                code = #{code, jdbcType=VARCHAR},
-            </if>
-            <if test="updateId != null">
-                update_id = #{updateId, jdbcType=INTEGER},
-            </if>
-            <if test="updateName != null and updateName != ''">
-                update_name = #{updateName, jdbcType=VARCHAR},
-            </if>
-            <if test="createDate != null">
-                update_date = #{createDate, jdbcType=TIMESTAMP},
-            </if>
-            <if test="status != null and status != ''">
-                status = #{status, jdbcType=VARCHAR},
-            </if>
-            <if test="remark != null and remark != ''">
-                remark = #{remark, jdbcType=VARCHAR},
-            </if>
-        </set>
-        where id = #{id, jdbcType=INTEGER}
-    </update>
+    <delete id="dropRoleModules" parameterType="java.lang.Long">
+        DELETE FROM sys_role_module WHERE role_id = #{roleId}
+    </delete>
 
-    <delete id="delete" parameterType="integer">
-        delete table sys_role where id = #{id, jdbcType=INTEGER}
+    <delete id="dropRoleUsers" parameterType="java.lang.Long">
+        DELETE FROM sys_user_role WHERE role_id = #{roleId}
     </delete>
 
 </mapper>

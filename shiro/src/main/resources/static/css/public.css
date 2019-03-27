@@ -123,7 +123,7 @@
 .panel_icon {
     width: 40%;
     display: inline-block;
-    line-height: 80px;
+    /*line-height: 80px;*/
     float: left;
     position: relative;
     height: 100%;
@@ -276,7 +276,7 @@ form input.layui-input[disabled] {
     border-radius: 2px;
     width: 8px;
     height: 8px;
-    background: url(../img/close.png) no-repeat center;
+    background: url(../images/close.png) no-repeat center;
     background-size: 65%;
     padding: 4px;
 }

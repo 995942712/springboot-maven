@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ming.shiro.dao.security.UserDao">
+
+    <resultMap id="Users" type="com.ming.shiro.domain.security.User">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="login_name" property="loginName" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="locked" property="locked" jdbcType="TINYINT"/>
+        <result column="create_id" property="createId" jdbcType="BIGINT"/>
+        <result column="create_name" property="createName" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="update_id" property="updateId" jdbcType="BIGINT"/>
+        <result column="update_name" property="updateName" jdbcType="VARCHAR"/>
+        <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <collection property="moduleSet" ofType="com.ming.shiro.domain.security.Module">
+            <result column="module.id" property="id"/>
+            <result column="module.name" property="name"/>
+            <result column="module.url" property="url"/>
+            <result column="module.code" property="code"/>
+            <result column="module.bgColor" property="bgColor"/>
+            <result column="module.icon" property="icon"/>
+            <result column="module.sort" property="sort"/>
+        </collection>
+        <collection property="roleSet" ofType="com.ming.shiro.domain.security.Role">
+            <result column="role.id" property="id"/>
+            <result column="role.name" property="name"/>
+        </collection>
+    </resultMap>
+
+    <sql id="userColumn">
+        id,
+        login_name loginName,
+        password,
+        locked,
+        create_id createId,
+        create_name createName,
+        create_date createDate,
+        update_id updateId,
+        update_name updateName,
+        update_date updateDate,
+        status,
+        remark
+    </sql>
+
+    <select id="findByLoginName" parameterType="string" resultType="com.ming.shiro.domain.security.User">
+        SELECT
+          <include refid="userColumn"/>
+        FROM sys_user
+        WHERE login_name = #{loginName, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectUserByMap" resultMap="Users" parameterType="java.util.Map">
+        SELECT
+            u.id,
+            u.login_name loginName,
+            u.password,
+            u.locked,
+            u.status,
+            u.remark,
+            r.id AS "role.id",
+            r.name AS "role.name",
+            m.id AS "module.id",
+            m.name AS "module.name",
+            m.code AS "module.code",
+            m.url AS "module.url",
+            m.bg_color AS "module.bgColor",
+            m.icon AS "module.icon",
+            m.sort AS "module.sort"
+        FROM sys_user u
+        LEFT JOIN sys_user_role sur ON sur.user_id = u.id
+        LEFT JOIN sys_role r ON r.id = sur.role_id
+        LEFT JOIN sys_role_module srm ON srm.role_id = r.id
+        LEFT JOIN sys_module m ON m.id = srm.module_id
+        WHERE 1=1
+            <if test="id == 0 or id == null">
+                AND u.status = 0
+                AND r.status = 0
+            </if>
+            <if test="loginName !=null and loginName !=''">
+                AND u.login_name = #{loginName}
+            </if>
+            <if test="id != 0 and id != null">
+                AND u.id = #{id}
+            </if>
+    </select>
+
+    <select id="saveUserRoles">
+        INSERT INTO sys_user_role(
+            user_id,
+            role_id
+        ) VALUES
+        <foreach collection="roleIds" item="item" index="index" separator=",">
+            (
+                #{userId},
+                #{item.id}
+            )
+        </foreach>
+    </select>
+
+    <delete id="dropUserRolesByUserId" parameterType="java.lang.Long">
+        DELETE FROM sys_user_role WHERE user_id = #{userId}
+    </delete>
+
+    <select id="selectUserModuleCount" resultType="java.util.Map">
+        SELECT
+        (SELECT count(*) FROM sys_user WHERE status = 0) AS "sys:user:list",
+        (SELECT count(*) FROM sys_role WHERE status = 0) AS "sys:role:list",
+        (SELECT count(*) FROM sys_module WHERE status = 0) AS "sys:menu:list",
+        (SELECT count(*) FROM sys_rescource WHERE status = 0) AS "sys:rescource:list",
+        (SELECT count(*) FROM sys_log WHERE status = 0) AS "sys:log:list",
+        24 AS "sys:site:list",
+        (SELECT count(*) FROM information_schema.tables WHERE table_schema='test') AS "sys:table:list",
+        (SELECT count(*) FROM sys_dict WHERE status = 0) AS "sys:dict:list",
+        (SELECT count(*) FROM blog_comment WHERE status = 0) AS "blog:comment:list",
+        (SELECT count(*) FROM blog_article WHERE status = 0) AS "blog:article:list",
+        (SELECT count(*) FROM blog_channel WHERE status = 0) AS "blog:channel:list",
+        (SELECT count(*) FROM blog_tags WHERE status = 0) AS "blog:tags:list",
+        (SELECT count(*) FROM quartz_task WHERE status = 0) AS "quartz:task:list",
+        (SELECT count(*) FROM quartz_task_log WHERE status = 0) AS "quartz:log:list"
+    </select>
+
+</mapper>

@@ -1,168 +1,152 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ming.shiro.security.dao.ModuleDao">
+<mapper namespace="com.ming.shiro.dao.security.ModuleDao">
 
-    <resultMap id="Modules" type="com.ming.shiro.security.domain.Module">
-        <id column="id" property="id" jdbcType="INTEGER" />
-        <result column="name" property="name" jdbcType="VARCHAR" />
-        <result column="code" property="code" jdbcType="VARCHAR" />
-        <result column="parent_id" property="parentId" jdbcType="INTEGER" />
-        <result column="path" property="path" jdbcType="VARCHAR" />
-        <result column="url" property="url" jdbcType="VARCHAR" />
-        <result column="create_id" property="createId" jdbcType="INTEGER" />
-        <result column="create_name" property="createName" jdbcType="VARCHAR" />
-        <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
-        <result column="update_id" property="updateId" jdbcType="INTEGER" />
-        <result column="update_name" property="updateName" jdbcType="VARCHAR" />
-        <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
-        <result column="status" property="status" jdbcType="VARCHAR" />
-        <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <resultMap id="Modules" type="com.ming.shiro.domain.security.Module">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="icon" property="icon" jdbcType="VARCHAR"/>
+        <result column="is_show" property="isShow" jdbcType="TINYINT"/>
+        <result column="bg_color" property="bgColor" jdbcType="VARCHAR"/>
+        <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
+        <result column="level" property="level" jdbcType="INTEGER"/>
+        <result column="parent_ids" property="parentIds" jdbcType="VARCHAR"/>
+        <result column="sort" property="sort" jdbcType="INTEGER"/>
+        <result column="create_id" property="createId" jdbcType="BIGINT"/>
+        <result column="create_name" property="createName" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="update_id" property="updateId" jdbcType="BIGINT"/>
+        <result column="update_name" property="updateName" jdbcType="VARCHAR"/>
+        <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <collection property="children" select="getModules" column="{parentId=id, isShow=myIsShow}"/>
+    </resultMap>
+
+    <!--<resultMap id="Modules" type="com.ming.shiro.domain.vo.ModuleVo">-->
+        <!--<id column="id" property="id" jdbcType="BIGINT"/>-->
+        <!--<result column="name" property="name" jdbcType="VARCHAR"/>-->
+        <!--<result column="url" property="url" jdbcType="VARCHAR"/>-->
+        <!--<result column="icon" property="icon" jdbcType="VARCHAR"/>-->
+        <!--<result column="parent_id" property="parentId" jdbcType="BIGINT"/>-->
+        <!--<collection property="children" select="selectModuleVoByUser" column="{parentId=id, userId=myUserId}"/>-->
+    <!--</resultMap>-->
+
+    <resultMap id="ModuleVos" type="com.ming.shiro.domain.vo.ModuleVo">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="href" property="href"/>
+        <result column="icon" property="icon"/>
+        <result column="pid" property="pid"/>
+        <collection property="children" select="selectModuleVoByUser" column="{parentId=id, userId=myUserId}"></collection>
     </resultMap>
 
     <sql id="moduleColumn">
         id,
         name,
         code,
-        parent_id,
-        path,
         url,
-        create_id,
-        create_name,
-        create_date,
-        update_id,
-        update_name,
-        update_date,
+        icon,
+        is_show isShow,
+        bg_color bgColor,
+        parent_id parentId,
+        level,
+        parent_ids parentIds,
+        sort,
+        create_id createId,
+        create_name createName,
+        create_date createDate,
+        update_id updateId,
+        update_name updateName,
+        update_date updateDate,
         status,
         remark
     </sql>
 
-    <select id="findAll" resultMap="Modules">
-        select
-          <include refid="moduleColumn" />
-        from sys_module
+    <select id="getModules" resultMap="Modules" parameterType="java.util.Map">
+        SELECT
+            <include refid="moduleColumn"/>
+            ,#{isShow} myIsShow
+        FROM sys_module
+        WHERE
+            status = 0
+            <choose>
+                <when test="parentId != null and parentId!='' ">
+                    AND parent_id = #{parentId}
+                </when>
+                <otherwise>
+                    AND parent_id is NULL
+                </otherwise>
+            </choose>
+            <if test="isShow == true">
+                AND is_show = #{isShow}
+            </if>
+        ORDER BY sort DESC
     </select>
 
-    <select id="findList" parameterType="com.ming.shiro.security.domain.Module" resultMap="Modules">
-      select
-        <include refid="moduleColumn" />
-      from sys_module
-        <where>
-            1 = 1
+    <select id="showAllModulesList" resultType="com.ming.shiro.domain.security.Module" parameterType="java.util.Map">
+        SELECT
+            m.id,
+            m.name,
+            m.code,
+            m.url,
+            m.icon,
+            m.is_show isShow,
+            m.bg_color bgColor,
+            m.parent_id parentId,
+            m.level,
+            m.parent_ids parentIds,
+            m.sort,
+            m.create_date createDate,
+            m.update_date updateDate,
+            p.id parentTree.id,
+            p.name parentTree.name,
+            p.icon parentTree.icon
+        FROM (SELECT * FROM sys_module WHERE status = 0) m
+        LEFT JOIN sys_module p ON p.id = m.parent_id
+        WHERE 1=1
+            <if test="id != 0 and id != null">
+                AND m.id = #{id}
+            </if>
             <if test="name != null and name != ''">
-                and name = #{name, jdbcType=VARCHAR},
+                AND m.name LIKE CONCAT('%', '${name}', '%')
             </if>
             <if test="code != null and code != ''">
-                and code = #{code, jdbcType=VARCHAR},
+                AND m.code = #{code}
             </if>
-            <if test="path != null and path != ''">
-                and path = #{path, jdbcType=VARCHAR},
+            <if test="parentId != null and parentId != 0">
+                AND m.parent_id = #{parentId}
             </if>
-            <if test="url != null and url != ''">
-                and url = #{url, jdbcType=VARCHAR},
-            </if>
-            <if test="status != null and status != ''">
-                and status = #{status, jdbcType=VARCHAR},
-            </if>
-            <if test="createId != null">
-                and create_id = #{createId, jdbcType=INTEGER},
-            </if>
-            <if test="createName != null and createName != ''">
-                and create_name = #{createName, jdbcType=VARCHAR},
-            </if>
-            <if test="createDate != null">
-                and create_date = #{createDate, jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateId != null">
-                and update_id = #{updateId, jdbcType=INTEGER},
-            </if>
-            <if test="updateName != null and updateName != ''">
-                and update_name = #{updateName, jdbcType=VARCHAR},
-            </if>
-            <if test="updateDate != null">
-                and update_date = #{updateDate, jdbcType=TIMESTAMP},
-            </if>
-        </where>
     </select>
 
-    <select id="findById" parameterType="integer">
-      select
-        <include refid="moduleColumn" />
-      from sys_module where id = #{id, jdbcType=INTEGER}
+    <select id="selectModuleVoByUser" resultMap="ModuleVos" parameterType="java.util.Map">
+        SELECT
+            DISTINCT m.id id,
+            m.name title,
+            m.icon icon,
+            m.url href,
+            m.sort,
+            m.parent_id pid,
+            #{userId, jdbcType=BIGINT} myUserId
+        FROM (SELECT * FROM sys_module WHERE status = 0) m
+        LEFT JOIN sys_role_module srm ON srm.module_id = m.id
+        LEFT JOIN sys_role r ON r.id = srm.role_id
+        LEFT JOIN sys_user_role sur ON sur.role_id = r.id
+        LEFT JOIN sys_user u ON u.id = sur.user_id
+        WHERE
+          u.id = #{userId, jdbcType=BIGINT}
+            <choose>
+                <when test="parentId != null and parentId !='' ">
+                  AND m.parent_id = #{parentId}
+                </when>
+                <otherwise>
+                  AND m.parent_id IS NULL
+                </otherwise>
+            </choose>
+          AND m.is_show = true
+        ORDER BY m.sort DESC
     </select>
-
-    <insert id="save" parameterType="com.ming.shiro.security.domain.Module" useGeneratedKeys="true" keyProperty="id">
-      insert into sys_module(
-        id,
-        name,
-        code,
-        parent_id,
-        path,
-        url,
-        create_id,
-        create_name,
-        create_date,
-        update_id,
-        update_name,
-        update_date,
-        status,
-        remark
-      ) values (
-        #{id, jdbcType=INTEGER},
-        #{name, jdbcType=VARCHAR},
-        #{code, jdbcType=VARCHAR},
-        #{parentId, jdbcType=INTEGER},
-        #{path, jdbcType=VARCHAR},
-        #{url, jdbcType=VARCHAR},
-        #{createId, jdbcType=INTEGER},
-        #{createName, jdbcType=VARCHAR},
-        #{createDate, jdbcType=TIMESTAMP},
-        #{updateId, jdbcType=INTEGER},
-        #{updateName, jdbcType=VARCHAR},
-        #{createDate, jdbcType=TIMESTAMP},
-        #{status, jdbcType=VARCHAR},
-        #{remark, jdbcType=VARCHAR}
-      )
-    </insert>
-
-    <update id="update" parameterType="com.ming.shiro.security.domain.Module">
-      update sys_module
-          <set>
-              <if test="name != null and name != ''">
-                  name = #{name, jdbcType=VARCHAR},
-              </if>
-              <if test="code != null and code != ''">
-                  code = #{code, jdbcType=VARCHAR},
-              </if>
-              <if test="parentId != null">
-                  parent_id = #{parentId, jdbcType=INTEGER},
-              </if>
-              <if test="path != null and path != ''">
-                  path = #{path, jdbcType=VARCHAR},
-              </if>
-              <if test="url != null and url != ''">
-                  url = #{url, jdbcType=VARCHAR},
-              </if>
-              <if test="updateId != null">
-                  update_id = #{updateId, jdbcType=INTEGER},
-              </if>
-              <if test="updateName != null and updateName != ''">
-                  update_name = #{updateName, jdbcType=VARCHAR},
-              </if>
-              <if test="createDate != null">
-                  update_date = #{createDate, jdbcType=TIMESTAMP},
-              </if>
-              <if test="status != null and status != ''">
-                  status = #{status, jdbcType=VARCHAR},
-              </if>
-              <if test="remark != null and remark != ''">
-                  remark = #{remark, jdbcType=VARCHAR},
-              </if>
-          </set>
-      where id = #{id, jdbcType=INTEGER}
-    </update>
-
-    <delete id="delete" parameterType="integer">
-      delete table sys_module where id = #{id, jdbcType=INTEGER}
-    </delete>
 
 </mapper>
